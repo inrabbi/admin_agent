@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFarmerID - Reports & Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #218838;
+            --dark-green: #1e7e34;
+            --light-green: #d4edda;
+            --accent-blue: #17a2b8;
+            --warning-yellow: #ffc107;
+            --danger-red: #dc3545;
+            --lagos-blue: #1e4a7c;
+            --report-purple: #6f42c1;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-collapsed .nav-link-text {
+            display: none;
+        }
+        
+        .sidebar-collapsed .logo-text {
+            display: none;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s;
+        }
+        
+        .main-content-expanded {
+            margin-left: 80px;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--lagos-blue);
+        }
+        
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .stat-card {
+            border-radius: 10px;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .badge-pill {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(30, 74, 124, 0.1);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .toggle-btn {
+            position: fixed;
+            left: 235px;
+            top: 20px;
+            z-index: 1100;
+            background-color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn-collapsed {
+            left: 65px;
+        }
+        
+        .report-card {
+            border-left: 4px solid var(--report-purple);
+            transition: all 0.3s;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .report-type-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .tab-content {
+            min-height: 400px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--lagos-blue);
+            font-weight: 600;
+            border-bottom: 3px solid var(--lagos-blue);
+        }
+        
+        .insight-card {
+            border-left: 3px solid var(--lagos-blue);
+            transition: all 0.3s;
+        }
+        
+        .insight-card:hover {
+            background-color: #f8f9fa;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -250px;
+            }
+            
+            .sidebar-collapsed {
+                left: 0;
+                width: 80px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .toggle-btn {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 d-flex align-items-center">
+            <i class="bi bi-tree-fill text-success fs-4 me-2"></i>
+            <span class="logo-text fs-5 fw-bold">eFarmerID Lagos</span>
+        </div>
+        <hr class="bg-secondary mx-3 my-1">
+        <ul class="nav nav-pills flex-column mb-auto px-3">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link text-white">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    <span class="nav-link-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="agent.html" class="nav-link text-white">
+                    <i class="bi bi-people me-2"></i>
+                    <span class="nav-link-text">Agents</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="verification.html" class="nav-link text-white">
+                    <i class="bi bi-person-check me-2"></i>
+                    <span class="nav-link-text">Verifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="coverage.html" class="nav-link text-white">
+                    <i class="bi bi-map me-2"></i>
+                    <span class="nav-link-text">LGA Coverage</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="fraud.html" class="nav-link text-white">
+                    <i class="bi bi-flag me-2"></i>
+                    <span class="nav-link-text">Fraud Alerts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link active">
+                    <i class="bi bi-graph-up me-2"></i>
+                    <span class="nav-link-text">Reports</span>
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <a href="settings.html" class="nav-link text-white">
+                    <i class="bi bi-gear me-2"></i>
+                    <span class="nav-link-text">Settings</span>
+                </a>
+            </li>
+        </ul>
+        <hr class="bg-secondary mx-3 my-1">
+        <div class="px-3 pb-3">
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Admin" class="rounded-circle me-2" width="32" height="32">
+                    <span class="nav-link-text">Lagos Admin</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <div class="toggle-btn" id="toggleBtn">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content p-4" id="mainContent">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Reports & Analytics</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                <i class="bi bi-plus-circle"></i> Generate Custom Report
+            </button>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Reports Generated</h6>
+                                <h3 class="card-title mb-0">142</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> 12% from last month
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-primary">
+                                <i class="bi bi-file-earmark-text-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Scheduled Reports</h6>
+                                <h3 class="card-title mb-0">18</h3>
+                                <small class="text-info">
+                                    <i class="bi bi-clock-history"></i> 5 due today
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-info">
+                                <i class="bi bi-calendar-check-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Most Downloaded</h6>
+                                <h3 class="card-title mb-0">Verification Summary</h3>
+                                <small class="text-warning">
+                                    <i class="bi bi-download"></i> 42 downloads
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-warning">
+                                <i class="bi bi-cloud-arrow-down-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Data Freshness</h6>
+                                <h3 class="card-title mb-0">98%</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-check-circle"></i> Updated 5 min ago
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-success">
+                                <i class="bi bi-database-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select">
+                            <option selected>All Report Types</option>
+                            <option>Verification Reports</option>
+                            <option>Agent Performance</option>
+                            <option>Coverage Analysis</option>
+                            <option>Fraud Detection</option>
+                            <option>Financial Summaries</option>
+                            <option>System Audits</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Time Period</label>
+                        <select class="form-select">
+                            <option selected>Last 30 Days</option>
+                            <option>Last 7 Days</option>
+                            <option>Last Quarter</option>
+                            <option>Last Year</option>
+                            <option>Year to Date</option>
+                            <option>Custom Range</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">LGA</label>
+                        <select class="form-select">
+                            <option selected>All LGAs</option>
+                            <option>Agege</option>
+                            <option>Alimosho</option>
+                            <option>Amuwo-Odofin</option>
+                            <option>Apapa</option>
+                            <option>Badagry</option>
+                            <option>Epe</option>
+                            <option>Eti-Osa</option>
+                            <option>Ibeju-Lekki</option>
+                            <option>Ifako-Ijaiye</option>
+                            <option>Ikeja</option>
+                            <option>Ikorodu</option>
+                            <option>Kosofe</option>
+                            <option>Lagos Island</option>
+                            <option>Lagos Mainland</option>
+                            <option>Mushin</option>
+                            <option>Ojo</option>
+                            <option>Oshodi-Isolo</option>
+                            <option>Shomolu</option>
+                            <option>Surulere</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Search</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search reports...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-clockwise"></i> Reset Filters
+                </button>
+                <button class="btn btn-primary">
+                    <i class="bi bi-funnel"></i> Apply Filters
+                </button>
+            </div>
+        </div>
+        
+        <!-- Reports Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="reportsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="standard-tab" data-bs-toggle="tab" data-bs-target="#standard" type="button" role="tab">Standard Reports</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom" type="button" role="tab">Custom Reports</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="scheduled-tab" data-bs-toggle="tab" data-bs-target="#scheduled" type="button" role="tab">Scheduled Reports</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">Data Analytics</button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content" id="reportsTabsContent">
+            <!-- Standard Reports Tab -->
+            <div class="tab-pane fade show active" id="standard" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="chart-container mb-4">
+                            <h5 class="mb-3">Report Usage Overview</h5>
+                            <div class="chart-placeholder">
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-bar-chart-line fs-1"></i>
+                                    <p>Report usage statistics chart would display here</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">Standard Reports Library</h5>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-secondary active"><i class="bi bi-grid"></i></button>
+                                        <button class="btn btn-outline-secondary"><i class="bi bi-list"></i></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card report-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title">Daily Verification Summary</h6>
+                                                    <span class="badge bg-success">PDF</span>
+                                                </div>
+                                                <p class="card-text small">Summary of all farmer verifications completed each day with status breakdown</p>
+                                                <div class="mb-2">
+                                                    <span class="report-type-tag bg-primary text-white">Verification</span>
+                                                    <span class="report-type-tag bg-info text-white">Daily</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Updated: Today 8:30 AM</small>
+                                                    <div>
+                                                        <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download">
+                                                            <i class="bi bi-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card report-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title">Agent Performance Report</h6>
+                                                    <span class="badge bg-primary">Excel</span>
+                                                </div>
+                                                <p class="card-text small">Detailed analysis of agent performance metrics including verification counts and quality scores</p>
+                                                <div class="mb-2">
+                                                    <span class="report-type-tag bg-warning text-dark">Agents</span>
+                                                    <span class="report-type-tag bg-info text-white">Weekly</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Updated: Yesterday 5:45 PM</small>
+                                                    <div>
+                                                        <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download">
+                                                            <i class="bi bi-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card report-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title">LGA Coverage Analysis</h6>
+                                                    <span class="badge bg-success">PDF</span>
+                                                </div>
+                                                <p class="card-text small">Comprehensive coverage analysis across all LGAs with penetration rates and gaps</p>
+                                                <div class="mb-2">
+                                                    <span class="report-type-tag bg-success text-white">Coverage</span>
+                                                    <span class="report-type-tag bg-info text-white">Monthly</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Updated: Oct 15, 2023</small>
+                                                    <div>
+                                                        <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download">
+                                                            <i class="bi bi-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card report-card h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title">Fraud Detection Summary</h6>
+                                                    <span class="badge bg-danger">PDF</span>
+                                                </div>
+                                                <p class="card-text small">Summary of detected fraud patterns, attempted frauds, and prevention measures</p>
+                                                <div class="mb-2">
+                                                    <span class="report-type-tag bg-danger text-white">Fraud</span>
+                                                    <span class="report-type-tag bg-info text-white">Weekly</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">Updated: Oct 14, 2023</small>
+                                                    <div>
+                                                        <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download">
+                                                            <i class="bi bi-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-center mt-3">
+                                    <nav>
+                                        <ul class="pagination pagination-sm mb-0">
+                                            <li class="page-item disabled">
+                                                <a class="page-link" href="#">Previous</a>
+                                            </li>
+                                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="#">Next</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="chart-container mb-4">
+                            <h5 class="mb-3">Quick Insights</h5>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item insight-card px-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0">Verification Spike</h6>
+                                        <span class="badge bg-success">+18%</span>
+                                    </div>
+                                    <p class="mb-1 small text-muted">Alimosho LGA showed an 18% increase in verifications compared to last week</p>
+                                    <small class="text-muted">Detected: Today 9:45 AM</small>
+                                </div>
+                                <div class="list-group-item insight-card px-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0">Fraud Pattern Detected</h6>
+                                        <span class="badge bg-danger">New</span>
+                                    </div>
+                                    <p class="mb-1 small text-muted">New pattern of duplicate biometrics detected in Ikeja LGA</p>
+                                    <small class="text-muted">Detected: Yesterday 3:30 PM</small>
+                                </div>
+                                <div class="list-group-item insight-card px-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0">Performance Improvement</h6>
+                                        <span class="badge bg-success">+12%</span>
+                                    </div>
+                                    <p class="mb-1 small text-muted">Agent verification quality scores improved by 12% this month</p>
+                                    <small class="text-muted">Detected: Oct 15, 2023</small>
+                                </div>
+                                <div class="list-group-item insight-card px-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0">Coverage Gap Identified</h6>
+                                        <span class="badge bg-warning text-dark">Attention</span>
+                                    </div>
+                                    <p class="mb-1 small text-muted">Lagos Island LGA shows consistently low coverage at 28%</p>
+                                    <small class="text-muted">Detected: Oct 14, 2023</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h5 class="mb-3">Most Downloaded Reports</h5>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Weekly Verification Summary</h6>
+                                        <small class="text-muted">PDF Report</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">42</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Agent Performance Dashboard</h6>
+                                        <small class="text-muted">Excel Report</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">38</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Monthly Financial Summary</h6>
+                                        <small class="text-muted">PDF Report</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">35</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">LGA Coverage Analysis</h6>
+                                        <small class="text-muted">PDF Report</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">28</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Fraud Detection Report</h6>
+                                        <small class="text-muted">PDF Report</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">24</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Other tabs would be implemented similarly -->
+            <div class="tab-pane fade" id="custom" role="tabpanel">
+                <div class="text-center py-5">
+                    <i class="bi bi-clipboard-data fs-1 text-muted"></i>
+                    <h5 class="mt-3">Custom Reports</h5>
+                    <p class="text-muted">Create and manage your custom reports here</p>
+                    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                        Create Custom Report
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="scheduled" role="tabpanel">
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-check fs-1 text-muted"></i>
+                    <h5 class="mt-3">Scheduled Reports</h5>
+                    <p class="text-muted">View and manage your scheduled reports here</p>
+                    <button class="btn btn-primary mt-2">
+                        Schedule New Report
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="text-center py-5">
+                    <i class="bi bi-graph-up fs-1 text-muted"></i>
+                    <h5 class="mt-3">Data Analytics</h5>
+                    <p class="text-muted">Explore advanced data analytics and visualization tools</p>
+                    <button class="btn btn-primary mt-2">
+                        Launch Analytics Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Report Modal -->
+    <div class="modal fade" id="generateReportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Custom Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Report Name</label>
+                            <input type="text" class="form-control" placeholder="Enter report name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Report Type</label>
+                            <select class="form-select">
+                                <option selected>Select report type</option>
+                                <option>Verification Summary</option>
+                                <option>Agent Performance</option>
+                                <option>LGA Coverage</option>
+                                <option>Fraud Analysis</option>
+                                <option>Financial Summary</option>
+                                <option>System Audit</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">LGAs</label>
+                            <select class="form-select" multiple>
+                                <option selected>All LGAs</option>
+                                <option>Agege</option>
+                                <option>Alimosho</option>
+                                <option>Amuwo-Odofin</option>
+                                <option>Apapa</option>
+                                <option>Badagry</option>
+                                <option>Epe</option>
+                                <option>Eti-Osa</option>
+                                <option>Ibeju-Lekki</option>
+                                <option>Ifako-Ijaiye</option>
+                                <option>Ikeja</option>
+                                <option>Ikorodu</option>
+                                <option>Kosofe</option>
+                                <option>Lagos Island</option>
+                                <option>Lagos Mainland</option>
+                                <option>Mushin</option>
+                                <option>Ojo</option>
+                                <option>Oshodi-Isolo</option>
+                                <option>Shomolu</option>
+                                <option>Surulere</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Format</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="reportFormat" id="formatPDF" checked>
+                                    <label class="form-check-label" for="formatPDF">PDF</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="reportFormat" id="formatExcel">
+                                    <label class="form-check-label" for="formatExcel">Excel</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="reportFormat" id="formatCSV">
+                                    <label class="form-check-label" for="formatCSV">CSV</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Schedule (Optional)</label>
+                            <select class="form-select">
+                                <option selected>Run once</option>
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Generate Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            this.classList.toggle('toggle-btn-collapsed');
+            
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                toggleIcon.className = 'bi bi-chevron-right';
+            } else {
+                toggleIcon.className = 'bi bi-chevron-left';
+            }
+        });
+        
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Simulate data loading
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Reports page loaded');
+        });
+    </script>
+</body>
+</html>

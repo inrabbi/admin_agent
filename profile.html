@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - eFarmerID Lagos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #218838;
+            --dark-green: #1e7e34;
+            --light-green: #d4edda;
+            --accent-blue: #17a2b8;
+            --agent-orange: #fd7e14;
+            --offline-red: #dc3545;
+            --lagos-blue: #1e4a7c;
+            --profile-purple: #6f42c1;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .agent-header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .page-header {
+            background: linear-gradient(to right, var(--lagos-blue), var(--accent-blue));
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-header {
+            background: linear-gradient(to right, var(--lagos-blue), var(--accent-blue));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .profile-body {
+            padding: 2rem;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            padding: 1rem;
+            min-width: 150px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--lagos-blue);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .profile-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .profile-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .section-title {
+            color: var(--lagos-blue);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light-green);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: flex-start;
+        }
+        
+        .info-label {
+            min-width: 150px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #6c757d;
+        }
+        
+        .edit-toggle {
+            color: var(--lagos-blue);
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .edit-toggle:hover {
+            text-decoration: underline;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            border-radius: 5px;
+            background-color: var(--lagos-blue);
+        }
+        
+        .badge-custom {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .activity-item {
+            padding: 1rem;
+            border-left: 3px solid var(--lagos-blue);
+            margin-bottom: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .activity-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .activity-content {
+            font-size: 0.9rem;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 500;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--lagos-blue);
+            border-bottom: 3px solid var(--lagos-blue);
+            background-color: transparent;
+        }
+        
+        .tab-content {
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .profile-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s;
+            border-left: 4px solid var(--lagos-blue);
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            height: 100%;
+        }
+        
+        .btn-lagos {
+            background-color: var(--lagos-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .btn-lagos:hover {
+            background-color: #15345e;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-item {
+                margin-bottom: 1rem;
+            }
+            
+            .info-item {
+                flex-direction: column;
+            }
+            
+            .info-label {
+                min-width: auto;
+                margin-bottom: 0.5rem;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Agent Header -->
+    <header class="agent-header mb-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-tree-fill text-success fs-4 me-2"></i>
+                    <span class="fs-5 fw-bold">eFarmerID Lagos</span>
+                    <span class="badge bg-secondary ms-2">Agent Portal</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="bi bi-geo-alt-fill me-1"></i>
+                        <span>Lagos State</span>
+                    </div>
+                    <div class="agent-status me-3">
+                        <i class="bi bi-wifi"></i> Online
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="agentMenu" data-bs-toggle="dropdown">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Agent" class="rounded-circle me-2" width="24" height="24">
+                            <span>LA-254</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="verifications.html"><i class="bi bi-journal-text me-2"></i>My Verifications</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1"><i class="bi bi-person me-2"></i> My Profile</h1>
+                    <p class="mb-0">Manage your personal information and track your performance</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-light me-2">
+                        <i class="bi bi-download me-2"></i> Export Data
+                    </button>
+                    <button class="btn btn-light">
+                        <i class="bi bi-printer me-2"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mb-5">
+        <!-- Profile Overview -->
+        <div class="profile-container">
+            <div class="profile-header">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Agent" class="profile-avatar">
+                <h3>Adeola Johnson</h3>
+                <p>Verification Agent | Lagos State</p>
+                <p class="mb-0"><i class="bi bi-award me-2"></i> Top Performer - October 2023</p>
+            </div>
+            
+            <div class="profile-body">
+                <!-- Stats Overview -->
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">142</div>
+                        <div class="stat-label">Total Verifications</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">18</div>
+                        <div class="stat-label">LGAs Covered</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4.8</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                </div>
+                
+                <!-- Personal Information -->
+                <div class="profile-section">
+                    <h4 class="section-title"><i class="bi bi-info-circle"></i> Personal Information</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Full Name:</span>
+                                <span class="info-value">Adeola Johnson</span>
+                                <span class="edit-toggle" data-bs-toggle="modal" data-bs-target="#editModal"><i class="bi bi-pencil"></i> Edit</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Agent ID:</span>
+                                <span class="info-value">LA-254</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">adeola.johnson@efarmerid.lagos.gov.ng</span>
+                                <span class="edit-toggle" data-bs-toggle="modal" data-bs-target="#editModal"><i class="bi bi-pencil"></i> Edit</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value">+234 801 234 5678</span>
+                                <span class="edit-toggle" data-bs-toggle="modal" data-bs-target="#editModal"><i class="bi bi-pencil"></i> Edit</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Date of Birth:</span>
+                                <span class="info-value">March 15, 1985</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Gender:</span>
+                                <span class="info-value">Male</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Joined Date:</span>
+                                <span class="info-value">January 10, 2022</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status:</span>
+                                <span class="info-value"><span class="badge bg-success">Active</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Professional Information -->
+                <div class="profile-section">
+                    <h4 class="section-title"><i class="bi bi-briefcase"></i> Professional Information</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Position:</span>
+                                <span class="info-value">Senior Verification Agent</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Department:</span>
+                                <span class="info-value">Field Operations</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Supervisor:</span>
+                                <span class="info-value">Tunde Williams (LA-101)</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="info-label">Primary LGA:</span>
+                                <span class="info-value">Alimosho</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Coverage Area:</span>
+                                <span class="info-value">15 LGAs</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Performance Rating:</span>
+                                <span class="info-value">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-half text-warning"></i>
+                                    (4.8/5.0)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills & Specializations -->
+                <div class="profile-section">
+                    <h4 class="section-title"><i class="bi bi-tools"></i> Skills & Specializations</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Biometric Verification</span>
+                                    <span>95%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Document Validation</span>
+                                    <span>88%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 88%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Farmer Engagement</span>
+                                    <span>92%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Technology Proficiency</span>
+                                    <span>96%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 96%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">Specializations</h5>
+                    <div>
+                        <span class="badge-custom"><i class="bi bi-check-lg me-1"></i> Cassava Farmers</span>
+                        <span class="badge-custom"><i class="bi bi-check-lg me-1"></i> Rice Cultivation</span>
+                        <span class="badge-custom"><i class="bi bi-check-lg me-1"></i> Vegetable Farming</span>
+                        <span class="badge-custom"><i class="bi bi-check-lg me-1"></i> Poultry Farmers</span>
+                        <span class="badge-custom"><i class="bi bi-check-lg me-1"></i> Fishery Verification</span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end mt-4">
+                    <button class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-download me-2"></i> Export Profile
+                    </button>
+                    <button class="btn btn-lagos">
+                        <i class="bi bi-pencil me-2"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabbed Content -->
+        <ul class="nav nav-tabs mb-3" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab">Performance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">Documents</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">Settings</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="profileTabsContent">
+            <!-- Performance Tab -->
+            <div class="tab-pane fade show active" id="performance" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="profile-card">
+                            <h5 class="mb-3"><i class="bi bi-graph-up me-2"></i> Monthly Performance</h5>
+                            <div class="text-center py-4">
+                                <i class="bi bi-bar-chart fs-1 text-muted"></i>
+                                <p class="mt-2">Monthly verification performance chart</p>
+                                <p class="text-muted small">Verifications: 142 | Success Rate: 92% | Rejections: 6</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card">
+                            <h5 class="mb-3"><i class="bi bi-award me-2"></i> Achievements</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-success">
+                                        <h6><i class="bi bi-trophy me-2"></i> Top Performer</h6>
+                                        <p class="mb-0 small">Awarded for highest verification count in October 2023</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-info">
+                                        <h6><i class="bi bi-star me-2"></i> Quality Excellence</h6>
+                                        <p class="mb-0 small">Recognized for highest accuracy rate in Q3 2023</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-warning">
+                                        <h6><i class="bi bi-people me-2"></i> Team Player</h6>
+                                        <p class="mb-0 small">Awarded for exceptional collaboration with field team</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-primary">
+                                        <h6><i class="bi bi-lightning me-2"></i> Fast Tracker</h6>
+                                        <p class="mb-0 small">Recognized for fastest verification processing time</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-geo me-2"></i> LGA Coverage</h5>
+                            <div class="text-center py-4">
+                                <i class="bi bi-map fs-1 text-muted"></i>
+                                <p class="mt-2">Verifications by LGA</p>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Alimosho</span>
+                                    <span>42</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width: 65%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Ikeja</span>
+                                    <span>28</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width: 45%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Badagry</span>
+                                    <span>18</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width: 30%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Others</span>
+                                    <span>54</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-target me-2"></i> Monthly Targets</h5>
+                            <div class="text-center py-4">
+                                <i class="bi bi-speedometer2 fs-1 text-muted"></i>
+                                <p class="mt-2">Progress towards monthly targets</p>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Verification Target</span>
+                                    <span>142/150</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 95%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Accuracy Target</span>
+                                    <span>92%/95%</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 97%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>LGA Coverage</span>
+                                    <span>18/20</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px;">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 90%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Tab -->
+            <div class="tab-pane fade" id="activity" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="profile-card">
+                            <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i> Recent Activity</h5>
+                            <div class="activity-item">
+                                <div class="activity-date">Today, 10:30 AM</div>
+                                <div class="activity-content">Completed verification for Chinedu Okoro in Alimosho LGA</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-date">Today, 9:15 AM</div>
+                                <div class="activity-content">Started verification for Samuel Adekunle in Ikorodu LGA</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-date">Yesterday, 3:45 PM</div>
+                                <div class="activity-content">Uploaded documents for Aisha Yusuf in Ikeja LGA</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-date">Yesterday, 11:20 AM</div>
+                                <div class="activity-content">Submitted verification for Tunde Lawal in Badagry LGA</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-date">Oct 15, 2023</div>
+                                <div class="activity-content">Attended training session on new verification protocols</div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-date">Oct 14, 2023</div>
+                                <div class="activity-content">Completed 5 verifications in Epe LGA</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-calendar me-2"></i> Activity Heatmap</h5>
+                            <div class="text-center py-4">
+                                <i class="bi bi-grid-3x3-gap fs-1 text-muted"></i>
+                                <p class="mt-2">Monthly activity heatmap</p>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-activity me-2"></i> Activity Summary</h5>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Verifications This Week</span>
+                                    <span class="fw-bold">18</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Verifications This Month</span>
+                                    <span class="fw-bold">142</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Average Daily Activity</span>
+                                    <span class="fw-bold">7.1</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Most Active Day</span>
+                                    <span class="fw-bold">Tuesday</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Most Active LGA</span>
+                                    <span class="fw-bold">Alimosho</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Documents Tab -->
+            <div class="tab-pane fade" id="documents" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="profile-card">
+                            <h5 class="mb-3"><i class="bi bi-file-earmark me-2"></i> My Documents</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Document</th>
+                                            <th>Type</th>
+                                            <th>Upload Date</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>ID_Card.pdf</td>
+                                            <td>Identification</td>
+                                            <td>Oct 10, 2023</td>
+                                            <td><span class="badge bg-success">Approved</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-download"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Employment_Letter.pdf</td>
+                                            <td>Employment</td>
+                                            <td>Oct 10, 2023</td>
+                                            <td><span class="badge bg-success">Approved</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-download"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Training_Certificate.pdf</td>
+                                            <td>Certification</td>
+                                            <td>Oct 15, 2023</td>
+                                            <td><span class="badge bg-warning">Pending</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-download"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Background_Check.pdf</td>
+                                            <td>Clearance</td>
+                                            <td>Sep 28, 2023</td>
+                                            <td><span class="badge bg-success">Approved</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-download"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button class="btn btn-lagos">
+                                    <i class="bi bi-upload me-2"></i> Upload Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-cloud-arrow-up me-2"></i> Upload New Document</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Document Type</label>
+                                <select class="form-select">
+                                    <option selected>Select document type...</option>
+                                    <option>Identification</option>
+                                    <option>Employment</option>
+                                    <option>Certification</option>
+                                    <option>Clearance</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Document File</label>
+                                <input type="file" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" rows="3" placeholder="Add a description for this document..."></textarea>
+                            </div>
+                            <button class="btn btn-lagos w-100">
+                                <i class="bi bi-upload me-2"></i> Upload Document
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" id="settings" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="profile-card">
+                            <h5 class="mb-3"><i class="bi bi-sliders me-2"></i> Account Settings</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" value="adeola.johnson@efarmerid.lagos.gov.ng">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" value="+234 801 234 5678">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Language Preference</label>
+                                <select class="form-select">
+                                    <option selected>English</option>
+                                    <option>Yoruba</option>
+                                    <option>Pidgin</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notification Preferences</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked id="notifEmail">
+                                    <label class="form-check-label" for="notifEmail">Email Notifications</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" checked id="notifSMS">
+                                    <label class="form-check-label" for="notifSMS">SMS Notifications</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifPush">
+                                    <label class="form-check-label" for="notifPush">Push Notifications</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-lagos">
+                                <i class="bi bi-check-circle me-2"></i> Save Settings
+                            </button>
+                        </div>
+                        
+                        <div class="profile-card">
+                            <h5 class="mb-3"><i class="bi bi-shield me-2"></i> Security Settings</h5>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i> Last password change: September 15, 2023
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="twoFactor">
+                                <label class="form-check-label" for="twoFactor">Enable Two-Factor Authentication</label>
+                            </div>
+                            <button class="btn btn-lagos">
+                                <i class="bi bi-key me-2"></i> Update Password
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-person-badge me-2"></i> Profile Visibility</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Profile Visibility</label>
+                                <select class="form-select">
+                                    <option selected>Public</option>
+                                    <option>Agents Only</option>
+                                    <option>Private</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contact Visibility</label>
+                                <select class="form-select">
+                                    <option selected>Agents Only</option>
+                                    <option>Supervisors Only</option>
+                                    <option>Private</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Activity Visibility</label>
+                                <select class="form-select">
+                                    <option selected>Public</option>
+                                    <option>Agents Only</option>
+                                    <option>Private</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-lagos w-100">
+                                <i class="bi bi-eye me-2"></i> Update Visibility
+                            </button>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h5 class="mb-3"><i class="bi bi-database me-2"></i> Data Management</h5>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i> These actions are irreversible. Please proceed with caution.
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary">
+                                    <i class="bi bi-download me-2"></i> Export My Data
+                                </button>
+                                <button class="btn btn-outline-danger">
+                                    <i class="bi bi-trash me-2"></i> Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel"><i class="bi bi-pencil me-2"></i> Edit Profile Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control" value="Adeola">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" value="Johnson">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" value="adeola.johnson@efarmerid.lagos.gov.ng">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" value="+234 801 234 5678">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" rows="3">Senior Verification Agent with 5 years of experience specializing in farmer verification across Lagos State.</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Profile Photo</label>
+                            <input type="file" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-lagos">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Handle edit toggles
+            const editToggles = document.querySelectorAll('.edit-toggle');
+            editToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const field = this.previousElementSibling;
+                    const currentValue = field.textContent;
+                    
+                    // In a real application, this would show an edit form
+                    console.log(`Editing field: ${field.previousElementSibling.textContent}`);
+                    
+                    // Show a toast notification
+                    showToast('Edit mode activated for ' + field.previousElementSibling.textContent);
+                });
+            });
+            
+            // Toast notification function
+            function showToast(message) {
+                // Create toast element
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                toast.style.zIndex = '11';
+                toast.innerHTML = `
+                    <div class="toast show" role="alert">
+                        <div class="toast-header">
+                            <i class="bi bi-info-circle text-primary me-2"></i>
+                            <strong class="me-auto">Notification</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                    </div>
+                `;
+                
+                // Add to document
+                document.body.appendChild(toast);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

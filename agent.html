@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFarmerID - Agent Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #218838;
+            --dark-green: #1e7e34;
+            --light-green: #d4edda;
+            --accent-blue: #17a2b8;
+            --warning-yellow: #ffc107;
+            --danger-red: #dc3545;
+            --lagos-blue: #1e4a7c;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-collapsed .nav-link-text {
+            display: none;
+        }
+        
+        .sidebar-collapsed .logo-text {
+            display: none;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s;
+        }
+        
+        .main-content-expanded {
+            margin-left: 80px;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--lagos-blue);
+        }
+        
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .stat-card {
+            border-radius: 10px;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .badge-pill {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(30, 74, 124, 0.1);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .toggle-btn {
+            position: fixed;
+            left: 235px;
+            top: 20px;
+            z-index: 1100;
+            background-color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn-collapsed {
+            left: 65px;
+        }
+        
+        .agent-detail-card {
+            border-left: 4px solid var(--lagos-blue);
+        }
+        
+        .performance-bar {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -250px;
+            }
+            
+            .sidebar-collapsed {
+                left: 0;
+                width: 80px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .toggle-btn {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 d-flex align-items-center">
+            <i class="bi bi-tree-fill text-success fs-4 me-2"></i>
+            <span class="logo-text fs-5 fw-bold">eFarmerID Lagos</span>
+        </div>
+        <hr class="bg-secondary mx-3 my-1">
+        <ul class="nav nav-pills flex-column mb-auto px-3">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link text-white">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    <span class="nav-link-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="agent.html" class="nav-link active">
+                    <i class="bi bi-people me-2"></i>
+                    <span class="nav-link-text">Agents</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="verification.html" class="nav-link text-white">
+                    <i class="bi bi-person-check me-2"></i>
+                    <span class="nav-link-text">Verifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="coverage.html" class="nav-link text-white">
+                    <i class="bi bi-map me-2"></i>
+                    <span class="nav-link-text">LGA Coverage</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="fraud.html" class="nav-link text-white">
+                    <i class="bi bi-flag me-2"></i>
+                    <span class="nav-link-text">Fraud Alerts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link text-white">
+                    <i class="bi bi-graph-up me-2"></i>
+                    <span class="nav-link-text">Reports</span>
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <a href="settings.html" class="nav-link text-white">
+                    <i class="bi bi-gear me-2"></i>
+                    <span class="nav-link-text">Settings</span>
+                </a>
+            </li>
+        </ul>
+        <hr class="bg-secondary mx-3 my-1">
+        <div class="px-3 pb-3">
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Admin" class="rounded-circle me-2" width="32" height="32">
+                    <span class="nav-link-text">Lagos Admin</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <div class="toggle-btn" id="toggleBtn">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content p-4" id="mainContent">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Agent Management</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAgentModal">
+                <i class="bi bi-plus-circle"></i> Add New Agent
+            </button>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Total Agents</h6>
+                                <h3 class="card-title mb-0">142</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> 8% from last month
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-primary">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Active Today</h6>
+                                <h3 class="card-title mb-0">118</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-check-circle"></i> 83% active
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-success">
+                                <i class="bi bi-person-check-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Pending Approval</h6>
+                                <h3 class="card-title mb-0">9</h3>
+                                <small class="text-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Requires review
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-warning">
+                                <i class="bi bi-person-dash-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Suspended</h6>
+                                <h3 class="card-title mb-0">5</h3>
+                                <small class="text-danger">
+                                    <i class="bi bi-exclamation-octagon"></i> Under investigation
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-danger">
+                                <i class="bi bi-person-x-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">LGA</label>
+                        <select class="form-select">
+                            <option selected>All LGAs</option>
+                            <option>Agege</option>
+                            <option>Alimosho</option>
+                            <option>Amuwo-Odofin</option>
+                            <option>Apapa</option>
+                            <option>Badagry</option>
+                            <option>Epe</option>
+                            <option>Eti-Osa</option>
+                            <option>Ibeju-Lekki</option>
+                            <option>Ifako-Ijaiye</option>
+                            <option>Ikeja</option>
+                            <option>Ikorodu</option>
+                            <option>Kosofe</option>
+                            <option>Lagos Island</option>
+                            <option>Lagos Mainland</option>
+                            <option>Mushin</option>
+                            <option>Ojo</option>
+                            <option>Oshodi-Isolo</option>
+                            <option>Shomolu</option>
+                            <option>Surulere</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select">
+                            <option selected>All Status</option>
+                            <option>Active</option>
+                            <option>Pending</option>
+                            <option>Suspended</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Performance</label>
+                        <select class="form-select">
+                            <option selected>All Performance</option>
+                            <option>Top Performers</option>
+                            <option>Average</option>
+                            <option>Needs Improvement</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label class="form-label">Search</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search agents...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-clockwise"></i> Reset Filters
+                </button>
+                <button class="btn btn-primary">
+                    <i class="bi bi-funnel"></i> Apply Filters
+                </button>
+            </div>
+        </div>
+        
+        <!-- Agents Table -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">All Agents</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-list-ul"></i> List
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-grid-3x3-gap"></i> Grid
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Agent</th>
+                                <th>Contact</th>
+                                <th>LGA</th>
+                                <th>Verifications</th>
+                                <th>Performance</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="avatar me-3" alt="Amina Yusuf">
+                                        <div>
+                                            <h6 class="mb-0">Amina Yusuf</h6>
+                                            <small class="text-muted">AGT-78901</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>+2348012345678</td>
+                                <td>Alimosho</td>
+                                <td>128</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress performance-bar w-100 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                                        </div>
+                                        <small>92%</small>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="avatar me-3" alt="John Okafor">
+                                        <div>
+                                            <h6 class="mb-0">John Okafor</h6>
+                                            <small class="text-muted">AGT-78902</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>+2348098765432</td>
+                                <td>Ikeja</td>
+                                <td>92</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress performance-bar w-100 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 65%"></div>
+                                        </div>
+                                        <small>65%</small>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Approve">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Reject">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/men/41.jpg" class="avatar me-3" alt="Mohammed Bello">
+                                        <div>
+                                            <h6 class="mb-0">Mohammed Bello</h6>
+                                            <small class="text-muted">AGT-78903</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>+2348055512345</td>
+                                <td>Kosofe</td>
+                                <td>156</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress performance-bar w-100 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 95%"></div>
+                                        </div>
+                                        <small>95%</small>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/women/68.jpg" class="avatar me-3" alt="Chioma Adeleke">
+                                        <div>
+                                            <h6 class="mb-0">Chioma Adeleke</h6>
+                                            <small class="text-muted">AGT-78904</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>+2348033344444</td>
+                                <td>Eti-Osa</td>
+                                <td>87</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress performance-bar w-100 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 42%"></div>
+                                        </div>
+                                        <small>42%</small>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-danger">Suspended</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Reinstate">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://randomuser.me/api/portraits/men/22.jpg" class="avatar me-3" alt="Tunde Lawal">
+                                        <div>
+                                            <h6 class="mb-0">Tunde Lawal</h6>
+                                            <small class="text-muted">AGT-78905</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>+2348077788888</td>
+                                <td>Badagry</td>
+                                <td>104</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress performance-bar w-100 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 88%"></div>
+                                        </div>
+                                        <small>88%</small>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1 action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="text-muted">Showing 1 to 5 of 142 agents</small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Agent Performance Section -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="chart-container h-100">
+                    <h5 class="mb-3">Top Performing Agents</h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/men/41.jpg" class="avatar me-3" alt="Mohammed Bello">
+                                <div>
+                                    <h6 class="mb-0">Mohammed Bello</h6>
+                                    <small class="text-muted">Kosofe LGA</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success">95%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="avatar me-3" alt="Amina Yusuf">
+                                <div>
+                                    <h6 class="mb-0">Amina Yusuf</h6>
+                                    <small class="text-muted">Alimosho LGA</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success">92%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/men/22.jpg" class="avatar me-3" alt="Tunde Lawal">
+                                <div>
+                                    <h6 class="mb-0">Tunde Lawal</h6>
+                                    <small class="text-muted">Badagry LGA</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success">88%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/women/28.jpg" class="avatar me-3" alt="Funke Adeyemi">
+                                <div>
+                                    <h6 class="mb-0">Funke Adeyemi</h6>
+                                    <small class="text-muted">Ikeja LGA</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-primary">85%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="https://randomuser.me/api/portraits/men/67.jpg" class="avatar me-3" alt="Emmanuel Okoro">
+                                <div>
+                                    <h6 class="mb-0">Emmanuel Okoro</h6>
+                                    <small class="text-muted">Lagos Island</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-primary">82%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container h-100">
+                    <h5 class="mb-3">Agent Distribution by LGA</h5>
+                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 5px;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-pie-chart fs-1"></i>
+                            <p>Agent distribution chart would display here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Agent Modal -->
+    <div class="modal fade" id="addAgentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Agent</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter first name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter last name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" placeholder="+234 800 000 0000">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" placeholder="agent@example.com">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">LGA</label>
+                                    <select class="form-select">
+                                        <option selected>Select LGA</option>
+                                        <option>Agege</option>
+                                        <option>Alimosho</option>
+                                        <option>Amuwo-Odofin</option>
+                                        <option>Apapa</option>
+                                        <option>Badagry</option>
+                                        <option>Epe</option>
+                                        <option>Eti-Osa</option>
+                                        <option>Ibeju-Lekki</option>
+                                        <option>Ifako-Ijaiye</option>
+                                        <option>Ikeja</option>
+                                        <option>Ikorodu</option>
+                                        <option>Kosofe</option>
+                                        <option>Lagos Island</option>
+                                        <option>Lagos Mainland</option>
+                                        <option>Mushin</option>
+                                        <option>Ojo</option>
+                                        <option>Oshodi-Isolo</option>
+                                        <option>Shomolu</option>
+                                        <option>Surulere</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ward</label>
+                                    <select class="form-select">
+                                        <option selected>Select Ward</option>
+                                        <option>Ward A</option>
+                                        <option>Ward B</option>
+                                        <option>Ward C</option>
+                                        <option>Ward D</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Home Address</label>
+                            <textarea class="form-control" rows="2" placeholder="Enter full address"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Profile Photo</label>
+                            <input type="file" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success">Add Agent</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            this.classList.toggle('toggle-btn-collapsed');
+            
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                toggleIcon.className = 'bi bi-chevron-right';
+            } else {
+                toggleIcon.className = 'bi bi-chevron-left';
+            }
+        });
+        
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Simulate data loading
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Agent management page loaded');
+        });
+    </script>
+</body>
+</html>

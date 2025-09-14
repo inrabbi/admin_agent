@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFarmerID - LGA Coverage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #218838;
+            --dark-green: #1e7e34;
+            --light-green: #d4edda;
+            --accent-blue: #17a2b8;
+            --warning-yellow: #ffc107;
+            --danger-red: #dc3545;
+            --lagos-blue: #1e4a7c;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-collapsed .nav-link-text {
+            display: none;
+        }
+        
+        .sidebar-collapsed .logo-text {
+            display: none;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s;
+        }
+        
+        .main-content-expanded {
+            margin-left: 80px;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--lagos-blue);
+        }
+        
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .stat-card {
+            border-radius: 10px;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .badge-pill {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(30, 74, 124, 0.1);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .toggle-btn {
+            position: fixed;
+            left: 235px;
+            top: 20px;
+            z-index: 1100;
+            background-color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn-collapsed {
+            left: 65px;
+        }
+        
+        .coverage-card {
+            border-left: 4px solid var(--lagos-blue);
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .coverage-progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .lga-map-container {
+            height: 500px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        
+        .map-marker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .map-marker:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 10;
+        }
+        
+        .high-coverage { background-color: var(--primary-green); }
+        .medium-coverage { background-color: var(--accent-blue); }
+        .low-coverage { background-color: var(--warning-yellow); }
+        .very-low-coverage { background-color: var(--danger-red); }
+        
+        .lga-details-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: none;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -250px;
+            }
+            
+            .sidebar-collapsed {
+                left: 0;
+                width: 80px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .toggle-btn {
+                left: 20px;
+            }
+            
+            .lga-details-panel {
+                position: relative;
+                width: 100%;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 d-flex align-items-center">
+            <i class="bi bi-tree-fill text-success fs-4 me-2"></i>
+            <span class="logo-text fs-5 fw-bold">eFarmerID Lagos</span>
+        </div>
+        <hr class="bg-secondary mx-3 my-1">
+        <ul class="nav nav-pills flex-column mb-auto px-3">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link text-white">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    <span class="nav-link-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="agent.html" class="nav-link text-white">
+                    <i class="bi bi-people me-2"></i>
+                    <span class="nav-link-text">Agents</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="verification.html" class="nav-link text-white">
+                    <i class="bi bi-person-check me-2"></i>
+                    <span class="nav-link-text">Verifications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="coverage.html" class="nav-link active">
+                    <i class="bi bi-map me-2"></i>
+                    <span class="nav-link-text">LGA Coverage</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="fraud.html" class="nav-link text-white">
+                    <i class="bi bi-flag me-2"></i>
+                    <span class="nav-link-text">Fraud Alerts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link text-white">
+                    <i class="bi bi-graph-up me-2"></i>
+                    <span class="nav-link-text">Reports</span>
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <a href="settings.html" class="nav-link text-white">
+                    <i class="bi bi-gear me-2"></i>
+                    <span class="nav-link-text">Settings</span>
+                </a>
+            </li>
+        </ul>
+        <hr class="bg-secondary mx-3 my-1">
+        <div class="px-3 pb-3">
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown">
+                    <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="Admin" class="rounded-circle me-2" width="32" height="32">
+                    <span class="nav-link-text">Lagos Admin</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <div class="toggle-btn" id="toggleBtn">
+        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content p-4" id="mainContent">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>LGA Coverage Analysis</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#coverageReportModal">
+                <i class="bi bi-download"></i> Generate Coverage Report
+            </button>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Total LGAs Covered</h6>
+                                <h3 class="card-title mb-0">15/20</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> 3 new in last month
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-primary">
+                                <i class="bi bi-map-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Farmers Registered</h6>
+                                <h3 class="card-title mb-0">10,392</h3>
+                                <small class="text-success">
+                                    <i class="bi bi-arrow-up"></i> 12.5% from last month
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-success">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Average Coverage</h6>
+                                <h3 class="card-title mb-0">68%</h3>
+                                <small class="text-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Needs improvement
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-warning">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted mb-2">Priority LGAs</h6>
+                                <h3 class="card-title mb-0">5</h3>
+                                <small class="text-danger">
+                                    <i class="bi bi-exclamation-octagon"></i> Require attention
+                                </small>
+                            </div>
+                            <div class="stat-card-icon text-danger">
+                                <i class="bi bi-flag-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lagos Map with Coverage Visualization -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Lagos State Coverage Map</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary active">Coverage View</button>
+                        <button class="btn btn-outline-secondary">Agent View</button>
+                        <button class="btn btn-outline-secondary">Verification View</button>
+                    </div>
+                </div>
+                
+                <div class="lga-map-container mb-4">
+                    <!-- This would be an interactive map in a real implementation -->
+                    <div class="text-center text-muted h-100 d-flex align-items-center justify-content-center">
+                        <div>
+                            <i class="bi bi-map fs-1"></i>
+                            <p>Interactive Lagos LGA coverage map would display here</p>
+                            <small>Click on LGAs to view detailed coverage information</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Map markers (simulated) -->
+                    <div class="map-marker high-coverage" style="top: 30%; left: 35%;" data-lga="Alimosho">A</div>
+                    <div class="map-marker high-coverage" style="top: 40%; left: 45%;" data-lga="Ikeja">I</div>
+                    <div class="map-marker medium-coverage" style="top: 50%; left: 30%;" data-lga="Badagry">B</div>
+                    <div class="map-marker medium-coverage" style="top: 60%; left: 50%;" data-lga="Kosofe">K</div>
+                    <div class="map-marker low-coverage" style="top: 70%; left: 40%;" data-lga="Epe">E</div>
+                    <div class="map-marker very-low-coverage" style="top: 25%; left: 55%;" data-lga="Lagos Island">L</div>
+                    
+                    <!-- Map legend -->
+                    <div class="map-legend">
+                        <h6 class="mb-3">Coverage Legend</h6>
+                        <div class="legend-item">
+                            <div class="legend-color high-coverage"></div>
+                            <span>High Coverage (80-100%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color medium-coverage"></div>
+                            <span>Medium Coverage (60-79%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color low-coverage"></div>
+                            <span>Low Coverage (40-59%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color very-low-coverage"></div>
+                            <span>Very Low Coverage (0-39%)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- LGA Details Panel -->
+                    <div class="lga-details-panel" id="lgaDetailsPanel">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 id="lgaName">LGA Name</h5>
+                            <button type="button" class="btn-close" id="closeDetailsPanel"></button>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Coverage Percentage</span>
+                                <span id="lgaCoveragePercent" class="fw-bold">0%</span>
+                            </div>
+                            <div class="progress coverage-progress mb-3">
+                                <div id="lgaCoverageProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <small class="text-muted">Farmers Registered</small>
+                                <h6 id="lgaFarmers">0</h6>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Active Agents</small>
+                                <h6 id="lgaAgents">0</h6>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Verification Rate</small>
+                            <h6 id="lgaVerificationRate">0%</h6>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary w-100">View Detailed Report</button>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-success me-2">High Coverage</span>
+                        <span class="badge bg-primary me-2">Medium Coverage</span>
+                        <span class="badge bg-warning me-2">Low Coverage</span>
+                        <span class="badge bg-danger">Very Low Coverage</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrows-fullscreen"></i> Expand Map
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Coverage Analysis Section -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="chart-container h-100">
+                    <h5 class="mb-3">Coverage by LGA</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>LGA</th>
+                                    <th>Cov. %</th>
+                                    <th>Farmers</th>
+                                    <th>Agents</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Alimosho</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress coverage-progress w-100 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                                            </div>
+                                            <small>92%</small>
+                                        </div>
+                                    </td>
+                                    <td>1,243</td>
+                                    <td>18</td>
+                                    <td><span class="badge bg-success">Excellent</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Ikeja</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress coverage-progress w-100 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 85%"></div>
+                                            </div>
+                                            <small>85%</small>
+                                        </div>
+                                    </td>
+                                    <td>982</td>
+                                    <td>15</td>
+                                    <td><span class="badge bg-success">Good</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Kosofe</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress coverage-progress w-100 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 72%"></div>
+                                            </div>
+                                            <small>72%</small>
+                                        </div>
+                                    </td>
+                                    <td>875</td>
+                                    <td>12</td>
+                                    <td><span class="badge bg-primary">Average</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Badagry</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress coverage-progress w-100 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 65%"></div>
+                                            </div>
+                                            <small>65%</small>
+                                        </div>
+                                    </td>
+                                    <td>743</td>
+                                    <td>10</td>
+                                    <td><span class="badge bg-primary">Average</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Epe</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress coverage-progress w-100 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
+                                            </div>
+                                            <small>45%</small>
+                                        </div>
+                                    </td>
+                                    <td>621</td>
+                                    <td>8</td>
+                                    <td><span class="badge bg-warning">Needs Work</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Lagos Island</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress coverage-progress w-100 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 28%"></div>
+                                            </div>
+                                            <small>28%</small>
+                                        </div>
+                                    </td>
+                                    <td>402</td>
+                                    <td>5</td>
+                                    <td><span class="badge bg-danger">Priority</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <a href="#" class="btn btn-sm btn-outline-primary">View All LGAs</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container h-100">
+                    <h5 class="mb-3">Coverage Trends</h5>
+                    <div style="height: 250px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 5px;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-bar-chart-line fs-1"></i>
+                            <p>Coverage trends chart would display here</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container mt-4">
+                    <h5 class="mb-3">Priority LGAs Needing Attention</h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Lagos Island</h6>
+                                <small class="text-muted">28% coverage - 5 agents</small>
+                            </div>
+                            <span class="badge bg-danger">Priority 1</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Eti-Osa</h6>
+                                <small class="text-muted">32% coverage - 6 agents</small>
+                            </div>
+                            <span class="badge bg-danger">Priority 2</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Amuwo-Odofin</h6>
+                                <small class="text-muted">38% coverage - 7 agents</small>
+                            </div>
+                            <span class="badge bg-warning">Priority 3</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Ibeju-Lekki</h6>
+                                <small class="text-muted">41% coverage - 6 agents</small>
+                            </div>
+                            <span class="badge bg-warning">Priority 4</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Ojo</h6>
+                                <small class="text-muted">44% coverage - 8 agents</small>
+                            </div>
+                            <span class="badge bg-warning">Priority 5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coverage Report Modal -->
+    <div class="modal fade" id="coverageReportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Coverage Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Report Type</label>
+                        <select class="form-select">
+                            <option selected>Comprehensive Coverage Report</option>
+                            <option>Priority Areas Report</option>
+                            <option>Agent Distribution Report</option>
+                            <option>Verification Progress Report</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Time Period</label>
+                        <select class="form-select">
+                            <option selected>Last 30 Days</option>
+                            <option>Last 7 Days</option>
+                            <option>Last Quarter</option>
+                            <option>Last Year</option>
+                            <option>Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">LGAs to Include</label>
+                        <select class="form-select">
+                            <option selected>All LGAs</option>
+                            <option>Only High Coverage LGAs</option>
+                            <option>Only Medium Coverage LGAs</option>
+                            <option>Only Low Coverage LGAs</option>
+                            <option>Select Specific LGAs</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Format</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="reportFormat" id="formatPDF" checked>
+                                <label class="form-check-label" for="formatPDF">PDF</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="reportFormat" id="formatExcel">
+                                <label class="form-check-label" for="formatExcel">Excel</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="reportFormat" id="formatCSV">
+                                <label class="form-check-label" for="formatCSV">CSV</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Generate Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-content-expanded');
+            this.classList.toggle('toggle-btn-collapsed');
+            
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                toggleIcon.className = 'bi bi-chevron-right';
+            } else {
+                toggleIcon.className = 'bi bi-chevron-left';
+            }
+        });
+        
+        // Simulated LGA data
+        const lgaData = {
+            'Alimosho': { coverage: 92, farmers: 1243, agents: 18, verificationRate: 95 },
+            'Ikeja': { coverage: 85, farmers: 982, agents: 15, verificationRate: 92 },
+            'Badagry': { coverage: 65, farmers: 743, agents: 10, verificationRate: 80 },
+            'Kosofe': { coverage: 72, farmers: 875, agents: 12, verificationRate: 85 },
+            'Epe': { coverage: 45, farmers: 621, agents: 8, verificationRate: 65 },
+            'Lagos Island': { coverage: 28, farmers: 402, agents: 5, verificationRate: 50 }
+        };
+        
+        // Handle map marker clicks
+        document.querySelectorAll('.map-marker').forEach(marker => {
+            marker.addEventListener('click', function() {
+                const lgaName = this.getAttribute('data-lga');
+                const data = lgaData[lgaName] || { coverage: 0, farmers: 0, agents: 0, verificationRate: 0 };
+                
+                // Update details panel
+                document.getElementById('lgaName').textContent = lgaName;
+                document.getElementById('lgaCoveragePercent').textContent = `${data.coverage}%`;
+                document.getElementById('lgaCoverageProgress').style.width = `${data.coverage}%`;
+                document.getElementById('lgaFarmers').textContent = data.farmers.toLocaleString();
+                document.getElementById('lgaAgents').textContent = data.agents;
+                document.getElementById('lgaVerificationRate').textContent = `${data.verificationRate}%`;
+                
+                // Update progress bar color based on coverage
+                const progressBar = document.getElementById('lgaCoverageProgress');
+                progressBar.className = 'progress-bar';
+                if (data.coverage >= 80) {
+                    progressBar.classList.add('bg-success');
+                } else if (data.coverage >= 60) {
+                    progressBar.classList.add('bg-primary');
+                } else if (data.coverage >= 40) {
+                    progressBar.classList.add('bg-warning');
+                } else {
+                    progressBar.classList.add('bg-danger');
+                }
+                
+                // Show the panel
+                document.getElementById('lgaDetailsPanel').style.display = 'block';
+            });
+        });
+        
+        // Close details panel
+        document.getElementById('closeDetailsPanel').addEventListener('click', function() {
+            document.getElementById('lgaDetailsPanel').style.display = 'none';
+        });
+        
+        // Simulate data loading
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('LGA coverage page loaded');
+        });
+    </script>
+</body>
+</html>
